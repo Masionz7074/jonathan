@@ -5,15 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const backgroundAudio = document.getElementById('backgroundAudio');
     const menuIcon = document.getElementById('menuIcon');
     const sidebar = document.getElementById('sidebar');
-    const backgroundAnimations = document.querySelector('.background-animations'); // Get the animation container
+    const backgroundContainer = document.querySelector('.background-container'); // Get the animation container
 
     // --- Jumpscare Button Functionality ---
     okayButton.addEventListener('click', function() {
-        // Reset and play jumpscare audio
         jumpscareAudio.currentTime = 0;
         jumpscareAudio.play().catch(e => {
             console.error("Error playing jumpscare audio:", e);
-            // Optional: Provide user feedback if playback fails
         });
     });
 
@@ -23,35 +21,73 @@ document.addEventListener('DOMContentLoaded', function() {
     const playBackgroundMusic = () => {
         backgroundAudio.play().catch(e => {
             console.warn("Background audio autoplay blocked:", e);
-            // We won't add a button to turn it on, so it will just be silent if blocked.
-            // A common practice is to add a subtle hint or try playing on ANY first user interaction,
-            // but for this request, we'll just attempt on load.
+            // No user control provided, so it will just remain silent if blocked.
         });
     };
 
     playBackgroundMusic(); // Try playing on load
-
-    // Optional: Try playing on the first click anywhere on the document as a fallback
-    // document.body.addEventListener('click', function firstClickPlay() {
-    //     playBackgroundMusic();
-    //     document.body.removeEventListener('click', firstClickPlay); // Only try once
-    // });
-
 
     // --- Sidebar Toggle Functionality ---
     menuIcon.addEventListener('click', function() {
         document.body.classList.toggle('sidebar-open'); // Toggle the class on the body
     });
 
-    // Optional: Close sidebar by clicking outside (more complex, involves checking click target)
-    // document.addEventListener('click', function(event) {
-    //     const isClickInsideSidebar = sidebar.contains(event.target);
-    //     const isClickOnMenuIcon = menuIcon.contains(event.target);
+    // Optional: Close sidebar by clicking outside
+    document.addEventListener('click', function(event) {
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickOnMenuIcon = menuIcon.contains(event.target);
 
-    //     if (document.body.classList.contains('sidebar-open') && !isClickInsideSidebar && !isClickOnMenuIcon) {
-    //         document.body.classList.remove('sidebar-open');
-    //     }
-    // });
+        if (document.body.classList.contains('sidebar-open') && !isClickInsideSidebar && !isClickOnMenuIcon) {
+            document.body.classList.remove('sidebar-open');
+        }
+    });
+
+
+    // --- Moving Star Generation ---
+    const createMovingStar = () => {
+        const star = document.createElement('div');
+        star.classList.add('moving-star');
+
+        // Random size (smaller than meteors)
+        const size = Math.random() * 2 + 1; // size between 1px and 3px
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+
+        // Random start position (coming from top-left area)
+        const startX = Math.random() * window.innerWidth * 0.4 - 100; // Start from left edge up to 40% width, slightly off-screen
+        const startY = Math.random() * window.innerHeight * 0.4 - 100; // Start from top edge up to 40% height, slightly off-screen
+        star.style.left = `${startX}px`;
+        star.style.top = `${startY}px`;
+
+        // Random animation duration (shorter than meteors for faster feel)
+        const duration = Math.random() * 4 + 3; // Duration between 3 and 7 seconds
+        star.style.animationDuration = `${duration}s`;
+
+        // Random animation delay (makes them appear staggered)
+        const delay = Math.random() * duration; // Delay between 0 and duration
+        star.style.animationDelay = `${delay}s`;
+
+        // Add the star to the background container
+        backgroundContainer.appendChild(star);
+
+        // Remove the star element when its animation finishes
+        star.addEventListener('animationend', () => {
+            star.remove();
+        });
+    };
+
+    // Generate moving stars continuously
+    const generateMovingStars = () => {
+        createMovingStar(); // Create one star
+
+        // Schedule the next star after a short random delay
+        const nextDelay = Math.random() * 200 + 50; // Wait 50ms to 250ms for the next star
+        setTimeout(generateMovingStars, nextDelay);
+    };
+
+    // Start the moving star generation
+    // Add a slight initial delay so static stars render first
+    setTimeout(generateMovingStars, 500);
 
 
     // --- Meteor Generation ---
@@ -60,33 +96,27 @@ document.addEventListener('DOMContentLoaded', function() {
         meteor.classList.add('meteor');
 
         // Random size
-        const size = Math.random() * 3 + 2; // size between 2px and 5px
+        const size = Math.random() * 5 + 3; // size between 3px and 8px (slightly larger than before)
         meteor.style.width = `${size}px`;
         meteor.style.height = `${size}px`;
-        meteor.style.borderRadius = '50%'; // Ensure it's round
+        // Radius handled by CSS
 
-        // Random start position - make it appear from random edges or corners
-        // Let's simplify and have them mainly come from the top-left area
-        const startX = Math.random() * window.innerWidth * 0.5 - 200; // Start from left edge up to halfway, slightly off-screen
-        const startY = Math.random() * window.innerHeight * 0.5 - 200; // Start from top edge up to halfway, slightly off-screen
+        // Random start position (coming from top-left area)
+        const startX = Math.random() * window.innerWidth * 0.3 - 200; // Start more towards the corner
+        const startY = Math.random() * window.innerHeight * 0.3 - 200;
         meteor.style.left = `${startX}px`;
         meteor.style.top = `${startY}px`;
 
         // Random animation duration
-        const duration = Math.random() * 5 + 5; // Duration between 5 and 10 seconds
+        const duration = Math.random() * 6 + 6; // Duration between 6 and 12 seconds (slower than stars)
         meteor.style.animationDuration = `${duration}s`;
 
         // Random animation delay
-        const delay = Math.random() * 5; // Delay between 0 and 5 seconds
+        const delay = Math.random() * 8; // Delay between 0 and 8 seconds
         meteor.style.animationDelay = `${delay}s`;
 
-        // Add slight random rotation (in case animation path isn't perfectly 45deg)
-        const rotation = Math.random() * 30 - 15; // Between -15 and 15 degrees
-         meteor.style.transform = `rotateZ(${rotation + 45}deg)`; // Add 45 for the base animation direction
-
-
         // Add the meteor to the background container
-        backgroundAnimations.appendChild(meteor);
+        backgroundContainer.appendChild(meteor);
 
         // Remove the meteor element when its animation finishes
         meteor.addEventListener('animationend', () => {
@@ -94,22 +124,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // Generate meteors periodically
-    const generateMeteors = () => {
-        // Generate a burst of meteors (e.g., 1 to 3)
-        const numberOfMeteors = Math.floor(Math.random() * 3) + 1;
+    // Generate meteors periodically in bursts
+     const generateMeteors = () => {
+        // Generate a small burst of meteors (e.g., 1 to 2)
+        const numberOfMeteors = Math.floor(Math.random() * 2) + 1;
         for (let i = 0; i < numberOfMeteors; i++) {
              // Add a slight delay between meteors in the burst
-            setTimeout(createMeteor, i * 500); // 500ms delay between each in the burst
+            setTimeout(createMeteor, i * 800); // 800ms delay between each in the burst
         }
 
-
         // Schedule the next burst
-        const nextDelay = Math.random() * 3000 + 1000; // Wait 1 to 4 seconds for the next burst
+        const nextDelay = Math.random() * 5000 + 3000; // Wait 3 to 8 seconds for the next burst
         setTimeout(generateMeteors, nextDelay);
     };
 
-    // Start the meteor generation
-    generateMeteors();
+    // Start the meteor generation after a short delay
+    setTimeout(generateMeteors, 1000);
+
 
 });
