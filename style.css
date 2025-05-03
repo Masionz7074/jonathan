@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+    font-family: sans-serif; /* Use a standard font */
+    background-color: #0a0a1a; /* Dark background similar to the image */
+    color: #ffffff; /* White text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure it takes up full viewport height */
+    text-align: center; /* Center the text horizontally */
+}
+
+.container {
+    /* Centering is handled by the body flexbox */
+}
+
+h1 {
+    color: #a0a0ff; /* A purple/blue color for the heading */
+    margin-bottom: 20px; /* Space below the heading */
+    font-size: 2.5em; /* Make the heading large */
+}
+
+button {
+    padding: 10px 20px; /* Padding inside the button */
+    font-size: 1.2em; /* Button text size */
+    cursor: pointer; /* Indicate it's clickable */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #5050ff; /* Blueish button color */
+    color: white; /* White text on button */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+button:hover {
+    background-color: #6060ff; /* Slightly lighter blue on hover */
+}
+
+/* Hide the audio element, it doesn't need to be visible */
+audio {
+    display: none;
+}
